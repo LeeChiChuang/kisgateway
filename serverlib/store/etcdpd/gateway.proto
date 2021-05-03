@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package gateway;
+
+option go_package = "../gateway";
+
+message ServerInfo {
+  int32 id = 1;
+
+  enum LoadType {
+    HTTP = 0;
+    TCP = 1;
+    GRPC = 2;
+  }
+
+  LoadType load_type = 2;
+  string service_name = 3;
+  string service_desc = 4;
+}
+
+enum Status {
+  OFF = 0;
+  ON = 1;
+}
+
+message AccessControl {
+  Status open_auth = 1;
+  string white_list = 2;
+  string black_list = 3;
+  string white_host_name = 4;
+  uint32 clientip_flow_limit = 5;
+  uint32 service_flow_limit = 6;
+}
+
+message LoadBalance {
+  uint32 check_method = 1;
+  uint32 check_timeout = 2;
+  uint32 check_interval = 3;
+  uint32 round_type = 4;
+  string ip_list = 5;
+  string weight_list = 6;
+  string forbid_list = 7;
+  uint32 upstream_connect_timeout = 8;
+  uint32 upstream_header_timeout = 9;
+  uint32 upstream_idle_timeout = 10;
+  uint32 upstream_max_idle = 11;
+}
+
+message HttpRule {
+  uint32 rule_type = 4;
+  string rule = 5;
+  Status need_https = 6;
+  Status need_strip_uri = 7;
+  Status need_websocket = 8;
+  string url_rewrite = 9;
+  string header_transform = 10;
+}
+
+message ServiceInfo {
+  ServerInfo server_info = 1;
+  AccessControl access_control = 2;
+  LoadBalance loadBalance = 3;
+  HttpRule httpRule = 4;
+}
+
+message Services {
+  repeated ServiceInfo service_info = 1;
+}
