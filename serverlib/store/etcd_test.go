@@ -8,7 +8,7 @@ import (
 
 func TestEtcdStore_AddHttpService(t *testing.T) {
 	e := NewEtcdStore("test")
-	item := &gateway.HttpService{
+	item := &gateway.ServiceInfo{
 		ServerInfo:           &gateway.ServerInfo{
 			Id:                   1,
 			LoadType:             1,
@@ -45,13 +45,15 @@ func TestEtcdStore_AddHttpService(t *testing.T) {
 			XXX_unrecognized:       nil,
 			XXX_sizecache:          0,
 		},
-		RuleType:             0,
-		Rule:                 "127.0.0.1",
-		NeedHttps:            0,
-		NeedStripUri:         0,
-		NeedWebsocket:        0,
-		UrlRewrite:           "",
-		HeaderTransform:      "",
+		HttpRule: &gateway.HttpRule{
+			RuleType:             0,
+			Rule:                 "127.0.0.1",
+			NeedHttps:            0,
+			NeedStripUri:         0,
+			NeedWebsocket:        0,
+			UrlRewrite:           "",
+			HeaderTransform:      "",
+		},
 		XXX_NoUnkeyedLiteral: struct{}{},
 		XXX_unrecognized:     nil,
 		XXX_sizecache:        0,

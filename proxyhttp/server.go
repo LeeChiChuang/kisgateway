@@ -40,7 +40,16 @@ func setRoute() *kishttp.Engine {
 
 	e.Use(
 		middleware.FindServiceMiddle(),
+		//限流
+		middleware.FlowLimitMiddleware(),
+		//Jwt鉴权
+		//租户流量统计
+		//租户限流
+		//白名单
+		//黑名单
+		//Header头转换
 		middleware.StripUrlMiddleware(),
+		//代理 负载均衡
 		middleware.ReverseProxyMiddleWare(),
 	)
 	return e

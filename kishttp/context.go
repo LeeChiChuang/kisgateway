@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"net"
 	"net/http"
+	"strings"
 )
 
 type H map[string]interface{}
@@ -67,6 +69,41 @@ func (c *Context) Set(key string, value interface{}) {
 	c.Keys[key] = value
 }
 
+func (c *Context) Get(key string) (value interface{}, exists bool) {
+	value, exists = c.Keys[key]
+	return
+}
+
+// GetHeader returns value from request headers.
+func (c *Context) GetHeader(key string) string {
+	return c.requestHeader(key)
+}
+
+
+// ClientIP implements a best effort algorithm to return the real client IP, it parses
+// X-Real-IP and X-Forwarded-For in order to work properly with reverse-proxies such us: nginx or haproxy.
+// Use X-Forwarded-For before X-Real-Ip as nginx uses X-Real-Ip with the proxy's IP.
+func (c *Context) ClientIP() string {
+	clientIP := c.requestHeader("X-Forwarded-For")
+	clientIP = strings.TrimSpace(strings.Split(clientIP, ",")[0])
+	if clientIP == "" {
+		clientIP = strings.TrimSpace(c.requestHeader("X-Real-Ip"))
+	}
+	if clientIP != "" {
+		return clientIP
+	}
+
+	if addr := c.requestHeader("X-Appengine-Remote-Addr"); addr != "" {
+			return addr
+		}
+
+	if ip, _, err := net.SplitHostPort(strings.TrimSpace(c.Req.RemoteAddr)); err == nil {
+		return ip
+	}
+
+	return ""
+}
+
 func (c *Context) Param(key string) string {
 	value, _ := c.Params[key]
 	return value
@@ -117,4 +154,8 @@ func (c *Context) HTML(code int, name string, data interface{}) {
 	if err := c.engine.htmlTemplates.ExecuteTemplate(c.Writer, name, data); err != nil {
 		c.Fail(500, err.Error())
 	}
+}
+
+func (c *Context) requestHeader(key string) string {
+	return c.Req.Header.Get(key)
 }

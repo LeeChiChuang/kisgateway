@@ -14,13 +14,13 @@ func FindServiceMiddle() kishttp.HandlerFunc {
 		servicesList := store.Store.HttpServices
 		for _, service := range servicesList {
 			//域名类型
-			if service.ServerInfo.LoadType == 0 && service.Rule == host {
+			if service.ServerInfo.LoadType == 0 && service.HttpRule.Rule == host {
 				c.Set("service", service)
 				return
 			}
 			//路径类型
 			if service.ServerInfo.LoadType == 1 &&
-				strings.HasPrefix(service.Rule, path) {
+				strings.HasPrefix(service.HttpRule.Rule, path) {
 				c.Set("service", service)
 				return
 			}
